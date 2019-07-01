@@ -1,26 +1,29 @@
 # AmrNotice
 
 ## Prerequisite
-* java8
-* Gradle
-* Spring Boot 2.0.8
 * git
-* redis
-* frontend : vuejs
+* Backend
+    * java8
+    * Gradle
+    * Spring Boot 2.0.8
+    * redis (embedded)
+* frontend
+    * vuejs
 
 ## 개발환경
 기본적으로 IDE는 IntelliJ 를 사용했으며 Frontend 파트는 Visual Source Code를 사용했습니다.
 
 먼저 프로젝트 clone 후 작업디렉토리로 이동합니다.
 ```
-$ git clone https://github.com/idek7/AmrNotice.git
-$ cd AmrNotice/test
+$ git clone https://github.com/idek7/AmrBoard.git
+$ cd AmrBoard
 ```
 
 ## Build & Run using IntelliJ
+
 #### IntelliJ 설정
 * File > New > Project from Existing sources 선택
-* 소스 기본 디렉토리 (AmrNotice/test) 선택
+* 소스 기본 디렉토리 (AmrBoard) 선택
 * import poject from external model 체크 및 gradle 선택 후 Next 클릭
 * Use auto-import 체크
 * jdk 및 gradle home 확인 후 Finish 선택
@@ -33,7 +36,7 @@ $ cd AmrNotice/test
 * 크롬 브라우저에서 http://localhost:9090 으로 접속하여 로그인 페이지 확인
 
 #### Run with Executable JAR
-* IntelliJ에서 gradle 창의 tasks > build > jar 선택
+* IntelliJ에서 gradle 창의 tasks > build > bootJar 선택
 * build/libs 디렉토리에 AmrNotice-0.0.1-SNAPSHOT.jar 확인
 * executable jar 파일로 실행
 ```
@@ -45,7 +48,7 @@ java -jar AmrNotice-0.0.1-SNAPSHOT.jar
 ## Build & Run using CLI
 * git clone 이후 작업 디렉토리로 이동
 ```
-$ cd AmrNotice/test
+$ cd AmrBoard
 ```
 * 다음 명령을 통해 build 및 실행
 ```
@@ -53,13 +56,17 @@ $ ./gradlew build -x test
 $ ./gradlew bootRun
 ```
 
+## 참고사항
+* spring boot active profile은 default로 local 설정 사용
+* Embedded Redis server를 사용하기 때무에 spring boot를 새롭게 실행하면 기존 공지 data는 모두 clear
+
 ## FrontEnd
 기본적으로 build된 frontend 파일들이 spring boot의 resources/static 하위 폴더에 적용된 상태입니다.
 만약 별도로 테스트 하거나 실행해야 할 경우 다음 build 및 run 관련 절차를 참고하면 됩니다.
 
 ### Build
 먼저 node 및 npm 은 설치되어 있다고 간주하고 이곳에서는 해당 내용은 생략합니다.
-* frontend 폴더로 이동 후 필요한 module 들 설치
+* frontend 폴더로 이동 후 필요한 module(s) 설치
 ```
 $ cd frontend
 $ npm install
