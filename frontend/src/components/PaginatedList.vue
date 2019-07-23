@@ -7,7 +7,7 @@
         <th>DATE</th>
         <th></th>
       </tr>
-      <tr v-for="p in paginatedData" :key="p.id">
+      <tr v-for="p in listArray" :key="p.id">
         <td style="width:55%;text-align:left">
           <div class="btn-group" style="font-size: 12px; line-height: 1;">
             <button type="button"
@@ -98,6 +98,10 @@ export default {
       type: Array,
       required: true
     },
+    totalCount: {
+      type: Number,
+      required: true
+    },
     pageSize: {
       type: Number,
       required: false,
@@ -107,9 +111,11 @@ export default {
   methods: {
     nextPage () {
       this.pageNum += 1
+      this.$emit('event', this.pageNum)
     },
     prevPage () {
       this.pageNum -= 1
+      this.$emit('event', this.pageNum)
     },
     onEdit (article) {
       console.log(article)
@@ -119,10 +125,10 @@ export default {
     },
     onDelete (id) {
       if (confirm('Do you really want to delete?')) {
-        this.$Axios.delete('/api/article/' + id)
+        this.$Axios.delete('/api/article2/' + id)
           .then(response => {
             console.log(response)
-            this.$emit('event')
+            this.$emit('event', this.pageNum)
           })
           .catch(err => {
             console.log(err)
@@ -135,7 +141,7 @@ export default {
         'content': content,
         'title': title
       }
-      this.$Axios.put('/api/article', payload)
+      this.$Axios.put('/api/article2', payload)
         .then(response => {
           console.log(response)
           this.$emit('event')
@@ -156,16 +162,11 @@ export default {
   },
   computed: {
     pageCount () {
-      let listLeng = this.listArray.length
+      let listLeng = this.totalCount
       let listSize = this.pageSize
       let page = Math.floor(listLeng / listSize)
       if (listLeng % listSize > 0) page += 1
       return page
-    },
-    paginatedData () {
-      const start = this.pageNum * this.pageSize
-      const end = start + this.pageSize
-      return this.listArray.slice(start, end)
     }
   }
 }

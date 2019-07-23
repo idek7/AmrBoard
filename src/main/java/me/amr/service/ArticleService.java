@@ -8,11 +8,13 @@ public interface ArticleService {
 
     List<Article> getArticleList();
 
-    Article getArticle(String id);
+    List<Article> getPagedList(int page);
+
+    Article getArticle(Long id);
 
     void addArticle(Article article);
 
     void updateArticle(Article article);
 
-    void deleteArticle(String id);
+    void deleteArticle(Long id);
 }

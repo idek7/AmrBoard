@@ -2,69 +2,66 @@ package me.amr.service.impl;
 
 import com.google.common.collect.ImmutableList;
 import me.amr.model.Article;
-import me.amr.repository.ArticleRepository;
+import me.amr.model.Article2;
+import me.amr.model.ArticlesObj;
+import me.amr.repository.ArticleJpaRepository;
 import me.amr.repository.RedisRepository;
-import me.amr.service.ArticleService;
+import me.amr.service.ArticleJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.query.SortQuery;
-import org.springframework.data.redis.core.query.SortQueryBuilder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Service
-public class ArticleServiceImpl implements ArticleService {
+public class ArticleJpaServiceImpl implements ArticleJpaService {
 
     private static final int SIZE_PER_PAGE = 10;
 
     private AtomicLong sequenceId = new AtomicLong();
 
     @Autowired
-    private ArticleRepository articleRepository;
+    private ArticleJpaRepository articleRepository;
 
     @Autowired
     private RedisRepository redisRepository;
 
     @Override
-    public List<Article> getArticleList() {
+    public List<Article2> getArticleList() {
 
         //Iterable<Article> list = articleRepository.findAll(new Sort(Sort.Direction.DESC, "id"));
 
-        List<Article> list = articleRepository.findAll();
-        list.sort((a, b) -> (int)(b.getId() - a.getId()));
+        List<Article2> list = articleRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
 
         return ImmutableList.copyOf(list);
     }
 
     @Override
-    public List<Article> getPagedList(int page) {
+    public ArticlesObj getPagedList(int page) {
+        Page<Article2> list = articleRepository.findAll(
+                PageRequest.of(page - 1, 10,
+                        Sort.by(new Sort.Order(Sort.Direction.DESC, "createDate"))
+                )
+        );
 
-        List<Article> list = redisRepository.getSortedPageableList(page);
-
-        /*Page<Article> list = articleRepository.findAll(PageRequest.of(page - 1, 10,  new Sort(
-                new Sort.Order(Sort.Direction.DESC, "id"))));*/
-
-        return ImmutableList.copyOf(list);
+        return ArticlesObj.builder()
+                .count(articleRepository.count())
+                .list(ImmutableList.copyOf(list))
+                .build();
     }
 
-    public Article getArticle(Long id) {
+    public Article2 getArticle(Long id) {
         return articleRepository.findById(id).get();
     }
 
     @Override
-    public void addArticle(Article article) {
+    public void addArticle(Article2 article) {
 
         long seqId = sequenceId.incrementAndGet();
-        Article newArticle = Article.builder()
+        Article2 newArticle = Article2.builder()
                 .id(seqId)
                 .title(article.getTitle())
                 .content(article.getContent())
@@ -75,8 +72,8 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public void updateArticle(Article article) {
-        Article updateArticle = articleRepository.findById(article.getId()).get();
+    public void updateArticle(Article2 article) {
+        Article2 updateArticle = articleRepository.findById(article.getId()).get();
         updateArticle.update(article.getTitle(), article.getContent());
 
         articleRepository.save(updateArticle);

@@ -3,20 +3,20 @@ package me.amr.model;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.redis.core.RedisHash;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Getter
-@RedisHash("Article")
-public class Article implements Serializable {
+@Entity
+@Table(name = "Article")
+public class Article2 implements Serializable {
 
 
     //제목, 작성일, 작성자, 최종수정일, 내용
-
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String title;               // 제목
@@ -27,10 +27,10 @@ public class Article implements Serializable {
     @Setter
     private LocalDateTime modDate;      // 수정일
 
-    public Article() {}
+    public Article2() {}
 
     @Builder
-    public Article(Long id, String title, String author, String content) {
+    public Article2(Long id, String title, String author, String content) {
         this.id = id;
         this.title = title;
         this.content = content;

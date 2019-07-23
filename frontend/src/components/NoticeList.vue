@@ -33,7 +33,7 @@
         </div>
       </div>
     </div>
-    <paginated-list :list-array="articles" @event="refresh" />
+    <paginated-list :list-array="articles" :total-count="totalCount" @event="refresh" />
   </div>
 </template>
 
@@ -49,7 +49,8 @@ export default {
     return {
       title: '',
       content: '',
-      articles: []
+      articles: [],
+      totalCount: 0
     }
   },
   created () {
@@ -75,7 +76,7 @@ export default {
         'content': content,
         'title': title
       }
-      this.$Axios.post('/api/article', payload)
+      this.$Axios.post('/api/article2', payload)
         .then(response => {
           console.log(response)
           this.refresh()
@@ -87,11 +88,16 @@ export default {
       this.title = ''
       this.content = ''
     },
-    refresh () {
-      this.$Axios.get('/api/article')
+    refresh (page) {
+      console.log('page', page)
+      page = page || 0
+      page += 1
+
+      this.$Axios.get('/api/article2/list/' + page)
         .then(response => {
           console.log(response)
-          this.articles = response.data
+          this.totalCount = response.data.count
+          this.articles = response.data.list
         })
         .catch(err => {
           console.log(err)
